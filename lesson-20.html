@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інтерактивний робочий аркуш — Основні поняття баз даних</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Rubik:wght@400;500;600;700;800&display=swap');
+:root{--ink:#17233b;--muted:#64748b;--blue:#2457d6;--teal:#0f9b91;--orange:#f29b38;--bg:#f3f6fc;--line:#dce4f0;--good:#16845b;--bad:#c84b4b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,Arial,sans-serif;line-height:1.55}
+.hero{background:linear-gradient(120deg,#142b55,#2457d6 65%,#0f9b91);color:white;padding:34px 20px 30px}
+.wrap{max-width:1020px;margin:auto}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;font-weight:800;opacity:.8}
+h1{font:800 clamp(1.8rem,4vw,3rem) Rubik,sans-serif;line-height:1.12;margin:10px 0}
+.hero p{max-width:760px;margin:10px 0 0;color:#e5edff}
+.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.pill{border:1px solid #ffffff55;background:#ffffff18;padding:7px 12px;border-radius:999px;font-size:.82rem}
+main{max-width:1020px;margin:24px auto;padding:0 16px 50px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:white;padding:15px 18px;border:1px solid var(--line);border-radius:16px;margin-bottom:18px;box-shadow:0 5px 18px #1d35570a}
+.progress{height:9px;background:#e8edf6;border-radius:99px;overflow:hidden;flex:1;min-width:150px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .25s}
+.score{font-weight:800;color:var(--blue);white-space:nowrap}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;margin:16px 0;box-shadow:0 6px 22px #1d35570a}
+.cardhead{display:flex;align-items:flex-start;gap:13px;margin-bottom:15px}
+.num{flex:0 0 38px;height:38px;border-radius:12px;background:#eaf0ff;color:var(--blue);display:grid;place-items:center;font-weight:800}
+h2{font:700 1.15rem Rubik,sans-serif;margin:2px 0 4px}.sub{color:var(--muted);font-size:.9rem}
+label{display:block;margin:8px 0;font-weight:600}
+button,select,input{font:inherit}
+button{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer;background:var(--blue);color:white;transition:.15s}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}button.secondary{background:#eaf0ff;color:var(--blue)}button.teal{background:var(--teal)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.options{display:grid;gap:9px;margin-top:12px}
+.option{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-weight:500}
+.option:hover{border-color:#9bb2ed;background:#f8faff}.option input{margin-top:5px;accent-color:var(--blue)}
+select,.textanswer{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:var(--ink)}
+.textanswer{min-height:76px;resize:vertical}
+.feedback{display:none;padding:11px 13px;border-radius:11px;margin-top:12px;font-size:.92rem;font-weight:600}
+.feedback.good{display:block;background:#e9f7f0;color:#116b49}.feedback.bad{display:block;background:#fff0f0;color:#a83232}.feedback.info{display:block;background:#eef4ff;color:#234da8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.matchrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #edf1f6}
+.matchrow:last-child{border:0}.matchrow strong{font-size:.94rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{padding:8px 12px;border:1px solid #bfd0f2;background:#f1f5ff;border-radius:10px;font-weight:700;cursor:grab;user-select:none}
+.chip.selected{background:#dce8ff;border:2px solid var(--blue)}
+.dropzone{border:2px dashed #b7c5d9;border-radius:12px;padding:12px;min-height:52px;background:#fafcff}
+.dropzone.over{background:#eaf4ff;border-color:var(--blue)}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:9px;text-align:left}th{background:#edf3ff}
+.callout{background:#f0f8f7;border-left:4px solid var(--teal);padding:12px 14px;border-radius:9px;margin:12px 0}
+.result{display:none;background:#172b50;color:white;border-radius:18px;padding:22px;margin-top:20px}
+.result h2{font-size:1.4rem}.small{font-size:.82rem;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:18px}
+@media(max-width:650px){.card{padding:17px}.grid2{grid-template-columns:1fr}.matchrow{grid-template-columns:1fr}.hero{padding-top:26px}}
+@media print{body{background:white}.hero{background:#244477!important;print-color-adjust:exact}.topbar,.actions,button{display:none!important}.card{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div class="eyebrow">Інформатика · 9 клас</div>
+<h1>Основні поняття баз даних</h1>
+<p>Інтерактивний робочий аркуш для закріплення понять: реляційна база даних, надлишковість, ключ таблиці та зв’язок «один-до-багатьох».</p>
+<div class="meta"><span class="pill">7 практичних завдань</span><span class="pill">Автоматична перевірка</span><span class="pill">Працює у браузері</span></div>
+</div></header>
+<main>
+<section class="card" id="presentation" aria-label="Презентація до уроку">
+<div class="cardhead"><div class="num">▶</div><div><h2>Презентація «Основи баз даних»</h2><div class="sub">Переглянь матеріал, а потім виконай інтерактивні завдання нижче.</div></div></div>
+<div style="position:relative;width:100%;height:0;padding-top:56.25%;overflow:hidden;border-radius:12px;background:#edf3ff;">
+<iframe loading="lazy" title="Презентація Основи баз даних" style="position:absolute;width:100%;height:100%;top:0;left:0;border:0;" src="https://www.canva.com/design/DAHaWn8Uitc/mu1QRpTnM8ywuGR0mTW9qQ/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen"></iframe>
+</div>
+<p class="small" style="margin:10px 2px 0;">Якщо презентація не відображається, <a href="https://www.canva.com/design/DAHaWn8Uitc/mu1QRpTnM8ywuGR0mTW9qQ/view?utm_content=DAHaWn8Uitc&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">відкрий її окремо в Canva</a>.</p>
+</section>
+<section class="topbar">
+<div><strong>Твій прогрес</strong><div class="small" id="progressText">Виконано завдань: 0 із 7</div></div>
+<div class="progress"><span id="progressBar"></span></div><div class="score" id="score">0 / 7 балів</div>
+</section>
+
+<section class="card" id="task1">
+<div class="cardhead"><div class="num">1</div><div><h2>Розпізнай елементи таблиці</h2><div class="sub">Обери правильне поняття для кожного опису.</div></div></div>
+<div class="matchrow"><strong>Рядок таблиці</strong><select id="t1a"><option value="">Обери відповідь</option><option>Об’єкт</option><option>Властивість об’єкта</option><option>Значення властивості</option></select></div>
+<div class="matchrow"><strong>Стовпець таблиці</strong><select id="t1b"><option value="">Обери відповідь</option><option>Об’єкт</option><option>Властивість об’єкта</option><option>Значення властивості</option></select></div>
+<div class="matchrow"><strong>Клітинка таблиці</strong><select id="t1c"><option value="">Обери відповідь</option><option>Об’єкт</option><option>Властивість об’єкта</option><option>Значення властивості</option></select></div>
+<div class="actions"><button onclick="check(1)">Перевірити</button><button class="secondary" onclick="resetTask(1)">Очистити</button></div><div class="feedback" id="f1"></div>
+</section>
+
+<section class="card" id="task2">
+<div class="cardhead"><div class="num">2</div><div><h2>Знайди надлишковість</h2><div class="sub">Прочитай ситуацію та вибери всі правильні твердження.</div></div></div>
+<div class="callout">В одній таблиці зберігаються автобуси та маршрути. У кількох рядках повторюються довжина й кількість зупинок маршруту № 9.</div>
+<div class="options">
+<label class="option"><input type="checkbox" name="t2" value="a"> Дані про маршрут повторюються в кожному рядку автобуса, що ним курсує.</label>
+<label class="option"><input type="checkbox" name="t2" value="b"> Якщо маршрут зміниться, доведеться оновлювати кілька клітинок.</label>
+<label class="option"><input type="checkbox" name="t2" value="c"> Повторення завжди робить дані точнішими.</label>
+<label class="option"><input type="checkbox" name="t2" value="d"> Якщо оновити не всі повтори, відомості можуть стати суперечливими.</label>
+</div>
+<div class="actions"><button onclick="check(2)">Перевірити</button><button class="secondary" onclick="resetTask(2)">Очистити</button></div><div class="feedback" id="f2"></div>
+</section>
+
+<section class="card" id="task3">
+<div class="cardhead"><div class="num">3</div><div><h2>Обери кращу структуру</h2><div class="sub">Як зменшити надлишковість даних про автобуси та маршрути?</div></div></div>
+<div class="options">
+<label class="option"><input type="radio" name="t3" value="a"> Зберігати автобуси й маршрути в одній великій таблиці та дублювати дані.</label>
+<label class="option"><input type="radio" name="t3" value="b"> Створити окремі таблиці «Автобуси» та «Маршрути», пов’язавши їх відповідними значеннями.</label>
+<label class="option"><input type="radio" name="t3" value="c"> Видалити всі відомості про маршрути.</label>
+</div>
+<div class="actions"><button onclick="check(3)">Перевірити</button><button class="secondary" onclick="resetTask(3)">Очистити</button></div><div class="feedback" id="f3"></div>
+</section>
+
+<section class="card" id="task4">
+<div class="cardhead"><div class="num">4</div><div><h2>Який стовпець може бути ключем?</h2><div class="sub">Ключ має містити унікальні значення, що ідентифікують об’єкти.</div></div></div>
+<p><strong>Таблиця «Люди»</strong></p>
+<table><thead><tr><th>№ паспорта</th><th>Прізвище</th><th>Ім’я</th><th>Рік народження</th></tr></thead><tbody><tr><td>КМ 381421</td><td>Круглєня</td><td>Дмитро</td><td>2007</td></tr><tr><td>РТ 905129</td><td>Жук</td><td>Ольга</td><td>2006</td></tr><tr><td>РС 140418</td><td>Кашпур</td><td>Ольга</td><td>2006</td></tr></tbody></table>
+<div class="options">
+<label class="option"><input type="radio" name="t4" value="a"> Прізвище</label>
+<label class="option"><input type="radio" name="t4" value="b"> Ім’я</label>
+<label class="option"><input type="radio" name="t4" value="c"> № паспорта</label>
+<label class="option"><input type="radio" name="t4" value="d"> Рік народження</label>
+</div>
+<div class="actions"><button onclick="check(4)">Перевірити</button><button class="secondary" onclick="resetTask(4)">Очистити</button></div><div class="feedback" id="f4"></div>
+</section>
+
+<section class="card" id="task5">
+<div class="cardhead"><div class="num">5</div><div><h2>Побудуй зв’язок «один-до-багатьох»</h2><div class="sub">Визнач, яка таблиця містить сторону «один», а яка — сторону «багато».</div></div></div>
+<div class="grid2">
+<div><label for="t5a">Сторона «один»</label><select id="t5a"><option value="">Обери таблицю</option><option>Люди</option><option>Квартири</option></select></div>
+<div><label for="t5b">Сторона «багато»</label><select id="t5b"><option value="">Обери таблицю</option><option>Люди</option><option>Квартири</option></select></div>
+</div>
+<div class="callout">В одній квартирі можуть мешкати кілька людей. Кожна людина проживає не більше ніж в одній квартирі.</div>
+<label for="t5c">У яку таблицю потрібно додати стовпець із номером квартири?</label>
+<select id="t5c"><option value="">Обери таблицю</option><option>Люди</option><option>Квартири</option></select>
+<div class="actions"><button onclick="check(5)">Перевірити</button><button class="secondary" onclick="resetTask(5)">Очистити</button></div><div class="feedback" id="f5"></div>
+</section>
+
+<section class="card" id="task6">
+<div class="cardhead"><div class="num">6</div><div><h2>Встанови відповідність</h2><div class="sub">Зістав поняття з його поясненням.</div></div></div>
+<div class="matchrow"><strong>База даних</strong><select id="t6a"><option value="">Обери пояснення</option><option value="a">Структура, що забезпечує узгодженість даних і мінімізує втрату інформації</option><option value="b">Стовпець або набір стовпців з унікальними значеннями</option><option value="c">База, у якій дані зберігаються в таблицях</option></select></div>
+<div class="matchrow"><strong>Реляційна база даних</strong><select id="t6b"><option value="">Обери пояснення</option><option value="a">Структура, що забезпечує узгодженість даних і мінімізує втрату інформації</option><option value="b">Стовпець або набір стовпців з унікальними значеннями</option><option value="c">База, у якій дані зберігаються в таблицях</option></select></div>
+<div class="matchrow"><strong>Ключ таблиці</strong><select id="t6c"><option value="">Обери пояснення</option><option value="a">Структура, що забезпечує узгодженість даних і мінімізує втрату інформації</option><option value="b">Стовпець або набір стовпців з унікальними значеннями</option><option value="c">База, у якій дані зберігаються в таблицях</option></select></div>
+<div class="actions"><button onclick="check(6)">Перевірити</button><button class="secondary" onclick="resetTask(6)">Очистити</button></div><div class="feedback" id="f6"></div>
+</section>
+
+<section class="card" id="task7">
+<div class="cardhead"><div class="num">7</div><div><h2>Поясни своїми словами</h2><div class="sub">Відповідай коротко. Після написання натисни «Показати орієнтир» для самоперевірки.</div></div></div>
+<label for="t7a">Чому надлишковість даних може призвести до втрати інформації?</label>
+<textarea class="textanswer" id="t7a" placeholder="Напиши 1–3 речення..."></textarea>
+<div class="actions"><button class="teal" onclick="showGuide()">Показати орієнтир</button><button class="secondary" onclick="resetTask(7)">Очистити</button></div>
+<div class="feedback info" id="f7">Орієнтир: якщо однакові відомості повторюються, їх потрібно змінювати в кількох місцях. Якщо частину повторів не оновити, виникнуть суперечливі дані й неможливо буде визначити, які з них правильні.</div>
+</section>
+
+<section class="result" id="finalResult"><h2>Результат роботи</h2><p id="resultText"></p><p id="resultAdvice"></p><div class="actions"><button onclick="window.print()" class="secondary">Друкувати / зберегти PDF</button><button onclick="location.reload()">Почати спочатку</button></div></section>
+<footer>Навчальний матеріал за §6 «Основні поняття баз даних». Виконуй завдання послідовно та перевіряй пояснення після кожної відповіді.</footer>
+</main>
+<script>
+const done={}, points={};
+const answers={
+1:{vals:['Об’єкт','Властивість об’єкта','Значення властивості'],msg:'Рядок відповідає об’єкту, стовпець — його властивості, клітинка — значенню властивості.'},
+2:{vals:['a','b','d'],msg:'Правильно: повторення збільшує обсяг даних, ускладнює оновлення й може спричинити суперечності.'},
+3:{vals:['b'],msg:'Окремі таблиці для різних типів об’єктів дають змогу зберігати відомості без зайвого дублювання.'},
+4:{vals:['c'],msg:'Номер паспорта є унікальним ідентифікатором. Прізвища, імена та роки народження можуть повторюватися.'},
+5:{vals:['Квартири','Люди','Люди'],msg:'Одна квартира може відповідати багатьом людям, тому номер квартири записують у таблиці «Люди» — на стороні «багато».'},
+6:{vals:['a','c','b'],msg:'База даних — організована структура; реляційна база зберігає дані в таблицях; ключ ідентифікує об’єкти унікальними значеннями.'}
+};
+function feedback(n,ok,msg){const el=document.getElementById('f'+n);el.className='feedback '+(ok?'good':'bad');el.textContent=(ok?'Правильно! ':'Є помилка. ')+msg;}
+function update(){const count=Object.keys(done).filter(k=>done[k]).length;const total=7;document.getElementById('progressText').textContent=`Виконано завдань: ${count} із ${total}`;document.getElementById('progressBar').style.width=(count/total*100)+'%';const sum=Object.values(points).reduce((a,b)=>a+b,0);document.getElementById('score').textContent=`${sum} / 6 балів`;if(count===7){document.getElementById('finalResult').style.display='block';document.getElementById('resultText').textContent=`Автоматично перевірено 6 завдань. Твій результат: ${sum} із 6 балів. Сьоме завдання виконано для самоперевірки.`;document.getElementById('resultAdvice').textContent=sum>=5?'Чудово! Основні поняття засвоєно. Не забудь завершити письмове завдання № 7.':'Переглянь пояснення до завдань і спробуй ще раз. Письмове завдання № 7 виконай самостійно.';}}
+function getVals(n){if(n===1)return ['t1a','t1b','t1c'].map(id=>document.getElementById(id).value);if(n===2)return [...document.querySelectorAll('input[name="t2"]:checked')].map(x=>x.value).sort();if(n===3||n===4)return [document.querySelector(`input[name="t${n}"]:checked`)?.value||''];if(n===5)return ['t5a','t5b','t5c'].map(id=>document.getElementById(id).value);if(n===6)return ['t6a','t6b','t6c'].map(id=>document.getElementById(id).value);}
+function check(n){const got=getVals(n),want=answers[n].vals;const ok=got.length===want.length&&got.every((v,i)=>v===want[i]);done[n]=true;points[n]=ok?1:0;feedback(n,ok,answers[n].msg);update();}
+function resetTask(n){const card=document.getElementById('task'+n);card.querySelectorAll('select').forEach(x=>x.selectedIndex=0);card.querySelectorAll('input').forEach(x=>x.checked=false);card.querySelectorAll('textarea').forEach(x=>x.value='');const f=document.getElementById('f'+n);f.className='feedback';f.textContent='';if(n===7)f.style.display='none';delete done[n];delete points[n];update();}
+function showGuide(){document.getElementById('f7').style.display='block';done[7]=true;update();}
+</script>
+</body></html>
